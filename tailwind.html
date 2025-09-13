@@ -4,190 +4,35 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Mobile Draggable Windows — MVP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    :root { 
-      --win: 18rem; 
-      --bg-primary: #171717;
-      --bg-secondary: #262626;
-      --text-primary: #f5f5f5;
-      --text-secondary: #a3a3a3;
-      --accent-from: #c026d3;
-      --accent-to: #4f46e5;
-      --border-color: rgba(255, 255, 255, 0.1);
-    }
-    
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    
-    html, body { 
-      height: 100%; 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    }
-    
+    :root { --win: 18rem; }
+    html, body { height: 100%; }
     /* Prevent page from rubber‑banding while dragging */
-    .no-overscroll { 
-      overscroll-behavior: none; 
-    }
-    
+    .no-overscroll { overscroll-behavior: none; }
     /* Smooth, GPU-friendly movement */
-    .dragging { 
-      transition: none !important; 
-    }
-    
-    /* Header styles */
-    .header {
-      padding: 1rem;
-      position: sticky;
-      top: 0;
-      background-color: rgba(23, 23, 23, 0.7);
-      backdrop-filter: blur(8px);
-      z-index: 50;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border-color);
-    }
-    
-    .header h1 {
-      font-weight: 600;
-    }
-    
-    .reset-btn {
-      padding: 0.5rem 0.75rem;
-      border-radius: 0.5rem;
-      background-color: #262626;
-      color: var(--text-primary);
-      border: none;
-      font-size: 0.875rem;
-      cursor: pointer;
-    }
-    
-    .reset-btn:hover {
-      background-color: #404040;
-    }
-    
-    /* Main canvas area */
-    .canvas {
-      position: relative;
-      height: calc(100svh - 56px);
-      touch-action: none;
-      user-select: none;
-    }
-    
-    /* Window styles */
-    .win {
-      position: absolute;
-      top: 1.5rem;
-      left: 1rem;
-      width: min(86vw, 380px);
-      max-width: 92vw;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-      border-radius: 1rem;
-      border: 1px solid var(--border-color);
-      background-color: rgba(38, 38, 38, 0.9);
-      backdrop-filter: blur(8px);
-      transition: transform 0.2s;
-      will-change: transform;
-    }
-    
-    .win-header {
-      cursor: grab;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 0.75rem;
-      border-top-left-radius: 1rem;
-      border-top-right-radius: 1rem;
-      background: linear-gradient(to right, var(--accent-from), var(--accent-to));
-      color: white;
-    }
-    
-    .win-header:active {
-      cursor: grabbing;
-    }
-    
-    .win-dot {
-      width: 0.5rem;
-      height: 0.5rem;
-      border-radius: 50%;
-      background-color: rgba(255, 255, 255, 0.8);
-    }
-    
-    .win-title {
-      font-size: 0.875rem;
-      font-weight: 600;
-      flex-grow: 1;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    
-    .minify-btn {
-      font-size: 0.75rem;
-      background-color: rgba(255, 255, 255, 0.1);
-      padding: 0.25rem 0.5rem;
-      border-radius: 0.375rem;
-      border: none;
-      color: white;
-      cursor: pointer;
-    }
-    
-    .minify-btn:hover {
-      background-color: rgba(255, 255, 255, 0.2);
-    }
-    
-    .win-content {
-      padding: 0.75rem;
-      font-size: 0.875rem;
-    }
-    
-    .win-content p {
-      opacity: 0.9;
-      margin-bottom: 0.5rem;
-    }
-    
-    .win-content ul, .win-content ol {
-      padding-left: 1.5rem;
-    }
-    
-    .win-content li {
-      margin-bottom: 0.25rem;
-    }
-    
-    .hidden {
-      display: none;
-    }
-    
-    /* Body styling */
-    body {
-      background-color: var(--bg-primary);
-      color: var(--text-primary);
-      min-height: 100svh;
-    }
+    .dragging { transition: none !important; }
   </style>
 </head>
-<body class="no-overscroll">
-  <header class="header">
-    <h1>Mobile Draggable Windows</h1>
-    <button id="resetBtn" class="reset-btn">Reset</button>
+<body class="no-overscroll bg-neutral-950 text-neutral-100 min-h-[100svh]">
+  <header class="p-4 sticky top-0 bg-neutral-950/70 backdrop-blur z-50 flex items-center justify-between border-b border-white/10">
+    <h1 class="font-semibold">Mobile Draggable Windows</h1>
+    <button id="resetBtn" class="px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-sm">Reset</button>
   </header>
 
-  <main id="canvas" class="canvas">
+  <main id="canvas" class="relative h-[calc(100svh-56px)] touch-none select-none">
     <!-- Window template clones will land here -->
   </main>
 
   <template id="tpl">
-    <section class="win">
-      <header class="win-header handle">
-        <div class="win-dot"></div>
-        <h2 class="win-title">Window</h2>
-        <button class="minify-btn minify">–</button>
+    <section class="win absolute top-6 left-4 w-[min(86vw,380px)] max-w-[92vw] shadow-2xl rounded-2xl border border-white/10 bg-neutral-900/90 backdrop-blur transition-transform duration-200 will-change-transform">
+      <header class="handle cursor-grab active:cursor-grabbing flex items-center gap-2 px-3 py-2 rounded-t-2xl bg-gradient-to-r from-fuchsia-600 to-indigo-600 text-white">
+        <div class="w-2 h-2 rounded-full bg-white/80"></div>
+        <h2 class="text-sm font-semibold grow truncate">Window</h2>
+        <button class="minify text-xs bg-white/10 hover:bg-white/20 px-2 py-1 rounded-md">–</button>
       </header>
-      <div class="win-content content">
-        <p>Drag me by the top bar. Works with touch (Pointer Events) and mouse. Stays within screen bounds and remembers position.</p>
+      <div class="content p-3 text-sm">
+        <p class="opacity-90">Drag me by the top bar. Works with touch (Pointer Events) and mouse. Stays within screen bounds and remembers position.</p>
       </div>
     </section>
   </template>
@@ -226,7 +71,7 @@
       node.dataset.id = id;
       node.style.transform = `translate(${x}px, ${y}px)`;
       node.style.zIndex = ++zTop;
-      node.querySelector('.win-title').textContent = title;
+      node.querySelector('h2').textContent = title;
       node.querySelector('.content').innerHTML = html;
 
       const handle = node.querySelector('.handle');
@@ -327,3 +172,4 @@
   </script>
 </body>
 </html>
+
