@@ -212,7 +212,7 @@
       let currentY = 1;
 
       document.querySelectorAll('.win').forEach(node => {
-        node.style.transform = `translate(16px, ${currentY}px)`;
+        node.style.transform = `translate(10px, ${currentY}px)`;
         const rect = node.getBoundingClientRect();
         currentY += rect.height + gap;
       });
