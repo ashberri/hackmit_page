@@ -213,12 +213,51 @@
     .win {
       animation: fadeIn 0.3s ease-out;
     }
+
+    /* Dropdown menu */
+    .dropdown {
+      position: absolute;
+      top: var(--header-height);
+      right: 1rem;
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      min-width: 150px;
+      display: flex;
+      flex-direction: column;
+      z-index: 200;
+      display: none; /* Hidden by default */
+    }
+
+    .dropdown.show {
+      display: flex; /* Show when toggled */
+    }
+
+    .dropdown a {
+      padding: 0.75rem 1rem;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .dropdown a:hover {
+      background-color: rgba(193,154,203,0.15);
+    }
   </style>
 </head>
 <body>
   <header class="header">
     <h1>ReLive!</h1>
-    <button id="resetBtn" class="reset-btn">Reset</button>
+    <div style="display:flex; gap:0.5rem; position:relative;">
+      <button id="resetBtn" class="reset-btn">Reset</button>
+      <button id="menuBtn" class="reset-btn">Menu</button>
+      <div id="menuDropdown" class="dropdown">
+        <a href="#">Option 1</a>
+        <a href="#">Option 2</a>
+        <a href="#">Option 3</a>
+      </div>
+    </div>
   </header>
 
   <main id="canvas" class="canvas">
@@ -344,6 +383,19 @@
     document.getElementById('resetBtn').addEventListener('click', () => {
       windowsData.forEach(w => localStorage.removeItem(w.id));
       location.reload();
+    });
+
+    const menuBtn = document.getElementById('menuBtn');
+    const menuDropdown = document.getElementById('menuDropdown');
+
+    menuBtn.addEventListener('click', () => {
+      menuDropdown.classList.toggle('show');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!menuBtn.contains(e.target) && !menuDropdown.contains(e.target)) {
+        menuDropdown.classList.remove('show');
+      }
     });
   </script>
 </body>
