@@ -17,7 +17,6 @@
       --accent-from: #f56ebd;
       --accent-to: #97f0b6;
       --border-color: #b1b0fe; 
-      --header-height: 56px;
     }
     
     * {
@@ -31,24 +30,25 @@
       font-family: 'Nunito', sans-serif;
     }
     
+    .no-overscroll { 
+      overscroll-behavior: none; 
+    }
+    
     .dragging { 
       transition: none !important; 
     }
     
     .header {
       padding: 1rem;
-      position: fixed;
+      position: sticky;
       top: 0;
-      left: 0;
-      right: 0;
       background-color: #fffdd0;
       backdrop-filter: blur(8px);
-      z-index: 100;
+      z-index: 50;
       display: flex;
       align-items: center;
       justify-content: space-between;
       border-bottom: 2px solid var(--border-color);
-      height: var(--header-height);
     }
     
     .header h1 {
@@ -72,11 +72,9 @@
     
     .canvas {
       position: relative;
-      min-height: calc(100svh - var(--header-height));
-      overflow-y: auto;
-      touch-action: pan-y;
+      height: calc(100svh - 56px);
+      touch-action: none;
       user-select: none;
-      padding-top: var(--header-height); /* prevent overlap with fixed header */
     }
     
     .win {
@@ -169,7 +167,7 @@
     }
   </style>
 </head>
-<body>
+<body class="no-overscroll">
   <header class="header">
     <h1>ReLIVE!</h1>
     <button id="resetBtn" class="reset-btn">Reset</button>
@@ -205,11 +203,13 @@
       { id: 'win-extra2', title: 'Extra Window 2', html: '<p>Another extra window.</p>' },
     ];
 
+    // create windows first (at provisional positions)
     windowsData.forEach(w => createWindow(w));
 
+    // then stack them using real heights
     function layoutWindows() {
       const gap = 24;
-      let currentY = 51;
+      let currentY = 1;
 
       document.querySelectorAll('.win').forEach(node => {
         node.style.transform = `translate(10px, ${currentY}px)`;
@@ -218,13 +218,14 @@
       });
     }
 
+    // run layout after DOM paints
     window.addEventListener('load', layoutWindows);
     window.addEventListener('resize', layoutWindows);
 
     function createWindow({ id, title, x = 0, y = 0, html }) {
       const node = tpl.content.firstElementChild.cloneNode(true);
       node.dataset.id = id;
-      node.style.transform = `translate(${x}px, ${y}px)`;
+      node.style.transform = `translate(${x}px, ${y}px)`; // provisional
       node.style.zIndex = ++zTop;
       node.querySelector('.win-title').textContent = title;
       node.querySelector('.content').innerHTML = html;
@@ -282,7 +283,7 @@
       const body = node.querySelector('.content');
       const isHidden = body.classList.toggle('hidden');
       node.querySelector('.minify').textContent = isHidden ? '+' : '–';
-      layoutWindows();
+      layoutWindows(); // reflow after toggle
     }
 
     function measureBounds(node) {
