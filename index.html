@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -7,35 +8,36 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
 
-    :root { 
-      --win: 18rem; 
+    :root {
+      --win: 18rem;
       --bg-primary: #FFFAF2;
       --bg-secondary: #262626;
       --text-primary: #333333;
       --text-secondary: #666666;
       --accent-from: #f56ebd;
       --accent-to: #97f0b6;
-      --border-color: #b1b0fe; 
+      --border-color: #b1b0fe;
       --header-height: 56px;
       --window-spacing: 1.2rem;
     }
-    
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
-    
-    html, body { 
-      height: 100%; 
+
+    html,
+    body {
+      height: 100%;
       font-family: 'Nunito', sans-serif;
     }
-    
-    .dragging { 
-      transition: none !important; 
+
+    .dragging {
+      transition: none !important;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
     }
-    
+
     .header {
       padding: 1rem;
       position: fixed;
@@ -51,32 +53,46 @@
       border-bottom: 2px solid var(--border-color);
       height: var(--header-height);
     }
-    
+
     .header h1 {
       font-weight: 700;
       color: #9ACD32;
       font-size: 1.5rem;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
     }
-    
+
     .reset-btn {
       padding: 0.5rem 1rem;
       border-radius: 0.75rem;
       background: linear-gradient(to right, #c19acb, #b28ac5);
       color: white;
       border: none;
-      font-weight: 600;
+      font-weight: 700;
+      /* Increased from 600 to 700 */
       font-size: 0.875rem;
       cursor: pointer;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow:
+        0 2px 5px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+      /* Added inner glow */
       transition: all 0.2s ease;
+      font-family: 'Nunito', sans-serif;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+      letter-spacing: 0.5px;
+      text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+      /* Added text shadow for boldness */
     }
-    
+
     .reset-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+      box-shadow:
+        0 4px 8px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+      /* Enhanced inner glow on hover */
     }
-    
+
     .canvas {
       position: relative;
       min-height: calc(100svh - var(--header-height));
@@ -89,7 +105,7 @@
       align-items: center;
       gap: var(--window-spacing);
     }
-    
+
     .win {
       position: relative;
       width: min(90vw, 400px);
@@ -101,11 +117,11 @@
       transition: all 0.2s ease;
       will-change: transform;
     }
-    
+
     .win:hover {
       box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.2);
     }
-    
+
     .win-header {
       cursor: grab;
       display: flex;
@@ -117,19 +133,19 @@
       background: linear-gradient(to right, var(--accent-from), var(--accent-to));
       color: white;
     }
-    
+
     .win-header:active {
       cursor: grabbing;
     }
-    
+
     .win-dot {
       width: 0.6rem;
       height: 0.6rem;
       border-radius: 50%;
       background-color: rgba(255, 255, 255, 0.9);
-      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
-    
+
     .win-title {
       font-size: 1rem;
       font-weight: 700;
@@ -138,7 +154,7 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    
+
     .minify-btn {
       font-size: 1rem;
       font-weight: bold;
@@ -150,66 +166,74 @@
       cursor: pointer;
       transition: all 0.2s ease;
     }
-    
+
     .minify-btn:hover {
       background-color: rgba(255, 255, 255, 0.25);
     }
-    
+
     .win-content {
       padding: 1rem;
       font-size: 0.95rem;
       line-height: 1.5;
       color: var(--text-primary);
     }
-    
+
     .win-content p {
       margin-bottom: 0.75rem;
     }
-    
-    .win-content ul, .win-content ol {
+
+    .win-content ul,
+    .win-content ol {
       padding-left: 1.5rem;
       margin-bottom: 0.5rem;
     }
-    
+
     .win-content li {
       margin-bottom: 0.5rem;
     }
-    
+
     .hidden {
       display: none;
     }
-    
+
     body {
       background: linear-gradient(135deg, var(--bg-primary) 0%, #f8f4e9 100%);
       color: var(--text-primary);
       min-height: 100svh;
     }
-    
+
     /* Scrollbar styling */
     .canvas::-webkit-scrollbar {
       width: 6px;
     }
-    
+
     .canvas::-webkit-scrollbar-track {
       background: rgba(0, 0, 0, 0.05);
       border-radius: 10px;
     }
-    
+
     .canvas::-webkit-scrollbar-thumb {
       background: rgba(193, 154, 203, 0.5);
       border-radius: 10px;
     }
-    
+
     .canvas::-webkit-scrollbar-thumb:hover {
       background: rgba(193, 154, 203, 0.7);
     }
-    
+
     /* Animation for new windows */
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
-    
+
     .win {
       animation: fadeIn 0.3s ease-out;
     }
@@ -222,16 +246,18 @@
       background: linear-gradient(#d8b4ff);
       border: 1px solid var(--border-color);
       border-radius: 0.5rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       min-width: 150px;
       display: flex;
       flex-direction: column;
       z-index: 200;
-      display: none; /* Hidden by default */
+      display: none;
+      /* Hidden by default */
     }
 
     .dropdown.show {
-      display: flex; /* Show when toggled */
+      display: flex;
+      /* Show when toggled */
     }
 
     .dropdown a {
@@ -242,10 +268,11 @@
     }
 
     .dropdown a:hover {
-      background-color: rgba(193,154,203,0.15);
+      background-color: rgba(193, 154, 203, 0.15);
     }
   </style>
 </head>
+
 <body>
   <header class="header">
     <h1>ReLive!</h1>
@@ -272,7 +299,8 @@
         <button class="minify-btn minify">–</button>
       </header>
       <div class="win-content content">
-        <p>Drag me by the top bar. Works with touch (Pointer Events) and mouse. Stays within screen bounds and remembers position.</p>
+        <p>Drag me by the top bar. Works with touch (Pointer Events) and mouse. Stays within screen bounds and remembers
+          position.</p>
       </div>
     </section>
   </template>
@@ -399,4 +427,5 @@
     });
   </script>
 </body>
+
 </html>
