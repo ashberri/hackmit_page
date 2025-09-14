@@ -1,182 +1,291 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ReLIVE!</title>
+  <title>ReLive!</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
 
-@import url('https://fonts.googleapis.com/css2?family=Bitcount+Grid+Double:wght@100..900&family=El+Messiri:wght@400..700&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Libertinus+Keyboard&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Orbitron:wght@400..900&family=Oxygen:wght@300;400;700&family=Tenor+Sans&display=swap');
-/* Libertinus Keyboard; Bitcount Grid Double; Josefin Sans; Oxygen; Orbitron; Tenor Sans; El Messiri*/ 
-:root { 
-      --win: 18rem; 
+    :root {
+      --win: 18rem;
       --bg-primary: #FFFAF2;
       --bg-secondary: #262626;
       --text-primary: #f5f5f5;
-      --text-secondary: #a3a3a3;
-      --accent-from: #f56ebd; /* #c026d3 #fe5a47 */
-      --accent-to: #97f0b6; /* #4f46e5 */
-      --border-color: #b1b0fe; 
+      --text-secondary: #666666;
+      --accent-from: #f56ebd;
+      --accent-to: #97f0b6;
+      --border-color: #b1b0fe;
+      --header-height: 56px;
+      --window-spacing: 1.2rem;
     }
-    
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
-    
-    html, body { 
-      height: 100%; 
-      font-family: 'Nunito', sans-serif; /* Nunito or Quicksand */
+
+    html,
+    body {
+      height: 100%;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 550;
     }
-    
-    /* Prevent page from rubber‑banding while dragging */
-    .no-overscroll { 
-      overscroll-behavior: none; 
+
+    .dragging {
+      transition: none !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
     }
-    
-    /* Smooth, GPU-friendly movement */
-    .dragging { 
-      transition: none !important; 
-    }
-    
-    /* Header styles */
+
     .header {
       padding: 1rem;
-      position: sticky;
+      position: fixed;
       top: 0;
-      background-color: #fffdd0;
+      left: 0;
+      right: 0;
+      background-color: #FFFDD0;
       backdrop-filter: blur(8px);
-      z-index: 50;
+      z-index: 100;
       display: flex;
       align-items: center;
       justify-content: space-between;
       border-bottom: 2px solid var(--border-color);
+      height: var(--header-height);
     }
-    
+
     .header h1 {
-      font-weight: 600;
-      color: #c0e264; 
+      font-weight: 700;
+      color: #9ACD32;
+      font-size: 1.5rem;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
     }
-    
+
     .reset-btn {
-      padding: 0.5rem 0.75rem;
-      border-radius: 0.5rem;
-      background-color: #c19acb;
-      color: var(--text-primary);
+      padding: 0.5rem 1rem;
+      border-radius: 0.75rem;
+      background: linear-gradient(to right, #c19acb, #b28ac5);
+      color: white;
       border: none;
+      font-weight: 700;
+      /* Increased from 600 to 700 */
       font-size: 0.875rem;
       cursor: pointer;
+      box-shadow:
+        0 2px 5px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+      /* Added inner glow */
+      transition: all 0.2s ease;
+      font-family: 'Nunito', sans-serif;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+      letter-spacing: 0.5px;
+      text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+      /* Added text shadow for boldness */
     }
-    
+
     .reset-btn:hover {
-      background-color: #404040;
+      transform: translateY(-2px);
+      box-shadow:
+        0 4px 8px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+      /* Enhanced inner glow on hover */
     }
-    
-    /* Main canvas area */
+
     .canvas {
       position: relative;
-      height: calc(100svh - 56px);
-      touch-action: none;
+      min-height: calc(100svh - var(--header-height));
+      overflow-y: auto;
+      touch-action: pan-y;
       user-select: none;
+      padding: calc(var(--header-height) + 1rem) 1rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--window-spacing);
     }
-    
-    /* Window styles */
+
     .win {
-      position: absolute;
-      top: 1.5rem;
-      left: 1rem;
-      width: min(86vw, 380px);
-      max-width: 92vw;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      position: relative;
+      width: min(90vw, 400px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
       border-radius: 1rem;
       border: 1px solid var(--border-color);
-      background-color: #c19acb; /* #b9aebc */
+      background-color: #c19acb;
       backdrop-filter: blur(8px);
-      transition: transform 0.2s;
+      transition: all 0.2s ease;
       will-change: transform;
     }
-    
+
+    .win:hover {
+      box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.2);
+    }
+
     .win-header {
       cursor: grab;
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.5rem 0.75rem;
+      padding: 0.75rem 1rem;
       border-top-left-radius: 1rem;
       border-top-right-radius: 1rem;
       background: linear-gradient(to right, var(--accent-from), var(--accent-to));
       color: white;
     }
-    
+
     .win-header:active {
       cursor: grabbing;
     }
-    
+
     .win-dot {
-      width: 0.5rem;
-      height: 0.5rem;
+      width: 0.6rem;
+      height: 0.6rem;
       border-radius: 50%;
-      background-color: rgba(255, 255, 255, 0.8);
+      background-color: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
-    
+
     .win-title {
-      font-size: 0.875rem;
-      font-weight: 600;
+      font-size: 1rem;
+      font-weight: 700;
       flex-grow: 1;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    
+
     .minify-btn {
-      font-size: 0.75rem;
-      background-color: rgba(255, 255, 255, 0.1);
-      padding: 0.25rem 0.5rem;
-      border-radius: 0.375rem;
+      font-size: 1rem;
+      font-weight: bold;
+      background-color: rgba(255, 255, 255, 0.15);
+      padding: 0.25rem 0.6rem;
+      border-radius: 0.5rem;
       border: none;
       color: white;
       cursor: pointer;
+      transition: all 0.2s ease;
     }
-    
+
     .minify-btn:hover {
-      background-color: rgba(255, 255, 255, 0.2);
+      background-color: rgba(255, 255, 255, 0.25);
     }
-    
+
     .win-content {
-      padding: 0.75rem;
-      font-size: 0.875rem;
+      padding: 1rem;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: var(--text-primary);
     }
-    
+
     .win-content p {
-      opacity: 0.9;
+      margin-bottom: 0.75rem;
+    }
+
+    .win-content ul,
+    .win-content ol {
+      padding-left: 1.5rem;
       margin-bottom: 0.5rem;
     }
-    
-    .win-content ul, .win-content ol {
-      padding-left: 1.5rem;
-    }
-    
+
     .win-content li {
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.5rem;
     }
-    
+
     .hidden {
       display: none;
     }
-    
-    /* Body styling */
+
     body {
-      background-color: var(--bg-primary);
+      background: linear-gradient(135deg, var(--bg-primary) 0%, #f8f4e9 100%);
       color: var(--text-primary);
       min-height: 100svh;
     }
+
+    /* Scrollbar styling */
+    .canvas::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .canvas::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 10px;
+    }
+
+    .canvas::-webkit-scrollbar-thumb {
+      background: rgba(193, 154, 203, 0.5);
+      border-radius: 10px;
+    }
+
+    .canvas::-webkit-scrollbar-thumb:hover {
+      background: rgba(193, 154, 203, 0.7);
+    }
+
+    /* Animation for new windows */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .win {
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    /* Dropdown menu */
+    .dropdown {
+      position: absolute;
+      top: var(--header-height);
+      right: 1rem;
+      background: linear-gradient(#d8b4ff);
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      min-width: 150px;
+      display: flex;
+      flex-direction: column;
+      z-index: 200;
+      display: none;
+      /* Hidden by default */
+    }
+
+    .dropdown.show {
+      display: flex;
+      /* Show when toggled */
+    }
+
+    .dropdown a {
+      padding: 0.75rem 1rem;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 550;
+    }
+
+    .dropdown a:hover {
+      background-color: rgba(193, 154, 203, 0.15);
+    }
   </style>
 </head>
-<body class="no-overscroll">
+
+<body>
   <header class="header">
-    <h1>ReLIVE!</h1>
-    <button id="resetBtn" class="reset-btn">Reset</button>
+    <h1>ReLive!</h1>
+    <div style="display:flex; gap:0.5rem; position:relative;">
+      <button id="resetBtn" class="reset-btn">Reset</button>
+      <button id="menuBtn" class="reset-btn">Menu</button>
+      <div id="menuDropdown" class="dropdown">
+        <a href="window1.html">Window 1</a>
+        <a href="window2.html">Window 2</a>
+        <a href="window3.html">Window 3</a>
+      </div>
+    </div>
   </header>
 
   <main id="canvas" class="canvas">
@@ -191,41 +300,37 @@
         <button class="minify-btn minify">–</button>
       </header>
       <div class="win-content content">
-        <p>Drag me by the top bar. Works with touch (Pointer Events) and mouse. Stays within screen bounds and remembers position.</p>
+        <p>Drag me by the top bar. Works with touch (Pointer Events) and mouse. Stays within screen bounds and remembers
+          position.</p>
       </div>
     </section>
   </template>
 
   <script>
-    /**
-     * Mobile-first draggable windows using Pointer Events.
-     * - Works on iOS Safari/Android Chrome/desktop.
-     * - Drags only by the .handle to avoid scroll conflict.
-     * - Constrains to viewport bounds.
-     * - Brings active window to front (z-index stack).
-     * - Persists positions in localStorage.
-     */
-
     const Z_BASE = 10; let zTop = Z_BASE;
     const canvas = document.getElementById('canvas');
     const tpl = document.getElementById('tpl');
 
     const windowsData = [
-      { id: 'win-topics', title: 'Topics', x: 16, y: 16, html: '<ul class="list-disc list-inside space-y-1"><li>Planning (42%)</li><li>Product (33%)</li><li>Team (18%)</li></ul>' },
-      { id: 'win-highlights', title: 'Highlights', x: 16, y: 166, html: '<div class="space-y-1"><div>Longest: 4m12s</div><div>Peak Sentiment: High @ 23:17</div></div>' },
-      { id: 'win-actions', title: 'Action Items', x: 16, y: 286, html: '<ol class="list-decimal list-inside space-y-1"><li>Ship UI prototype</li><li>Record demo</li><li>Sync with API</li></ol>' },
+      { id: 'win-topics', title: 'Topics', html: '<ul><li>Planning (42%)</li><li>Product (33%)</li><li>Team (18%)</li></ul>' },
+      { id: 'win-highlights', title: 'Highlights', html: '<div><div>Longest: 4m12s</div><div>Peak Sentiment: High @ 23:17</div></div>' },
+      { id: 'win-actions', title: 'Action Items', html: '<ol><li>Ship UI prototype</li><li>Record demo</li><li>Sync with API</li></ol>' },
+      { id: 'win-extra1', title: 'Extra Window 1', html: '<p>Additional content here.</p>' },
+      { id: 'win-extra2', title: 'Extra Window 2', html: '<p>Another extra window.</p>' },
     ];
 
-    // Restore persisted positions if any
+    // Load saved positions or use default layout
     windowsData.forEach(w => {
-      const saved = JSON.parse(localStorage.getItem(w.id) || 'null');
-      if (saved && Number.isFinite(saved.x) && Number.isFinite(saved.y)) { w.x = saved.x; w.y = saved.y; }
+      const savedPos = localStorage.getItem(w.id);
+      if (savedPos) {
+        const { x, y } = JSON.parse(savedPos);
+        createWindow({ ...w, x, y });
+      } else {
+        createWindow(w);
+      }
     });
 
-    // Create windows
-    windowsData.forEach(w => createWindow(w));
-
-    function createWindow({ id, title, x, y, html }) {
+    function createWindow({ id, title, x = 0, y = 0, html }) {
       const node = tpl.content.firstElementChild.cloneNode(true);
       node.dataset.id = id;
       node.style.transform = `translate(${x}px, ${y}px)`;
@@ -236,25 +341,20 @@
       const handle = node.querySelector('.handle');
       const minBtn = node.querySelector('.minify');
 
-      // Window state
-      let startX = 0, startY = 0; // pointer start
-      let winX = x, winY = y;     // current translate
+      let startX = 0, startY = 0;
+      let winX = x, winY = y;
       let dragging = false;
 
-      // Pointer Events (unified for touch & mouse)
       handle.addEventListener('pointerdown', onPointerDown, { passive: false });
       handle.addEventListener('dblclick', () => toggleMinify(node));
       minBtn.addEventListener('click', () => toggleMinify(node));
-
-      // Focus / raise on tap
       node.addEventListener('pointerdown', () => node.style.zIndex = ++zTop);
 
       function onPointerDown(e) {
-        e.preventDefault(); // prevent page pan while dragging
+        e.preventDefault();
         dragging = true;
         node.classList.add('dragging');
         startX = e.clientX; startY = e.clientY;
-        // current translate from style
         const m = node.style.transform.match(/translate\(([-0-9.]+)px,\s*([-0-9.]+)px\)/);
         if (m) { winX = parseFloat(m[1]); winY = parseFloat(m[2]); }
         node.setPointerCapture(e.pointerId);
@@ -267,7 +367,6 @@
         if (!dragging) return;
         e.preventDefault();
         const dx = e.clientX - startX; const dy = e.clientY - startY;
-        // Proposed new position
         let nx = winX + dx; let ny = winY + dy;
         const bounds = measureBounds(node);
         nx = Math.min(bounds.maxX, Math.max(bounds.minX, nx));
@@ -279,7 +378,6 @@
         dragging = false; node.classList.remove('dragging');
         node.releasePointerCapture(e.pointerId);
         node.removeEventListener('pointermove', onPointerMove);
-        // Persist
         const m = node.style.transform.match(/translate\(([-0-9.]+)px,\s*([-0-9.]+)px\)/);
         if (m) {
           localStorage.setItem(id, JSON.stringify({ x: parseFloat(m[1]), y: parseFloat(m[2]) }));
@@ -296,7 +394,6 @@
     }
 
     function measureBounds(node) {
-      // Keep the whole window inside the canvas
       const rect = canvas.getBoundingClientRect();
       const nrect = node.getBoundingClientRect();
       const pad = 8;
@@ -312,22 +409,24 @@
       return { x: m ? m[1] : 0, y: m ? m[2] : 0 };
     }
 
-    // Reset positions
     document.getElementById('resetBtn').addEventListener('click', () => {
       windowsData.forEach(w => localStorage.removeItem(w.id));
       location.reload();
     });
 
-    // Resize handling: nudge windows back into view if the keyboard/notch changes safe area
-    window.addEventListener('resize', () => {
-      document.querySelectorAll('.win').forEach(node => {
-        const bounds = measureBounds(node);
-        const pos = getTranslate(node);
-        let nx = Math.min(bounds.maxX, Math.max(bounds.minX, parseFloat(pos.x)));
-        let ny = Math.min(bounds.maxY, Math.max(bounds.minY, parseFloat(pos.y)));
-        node.style.transform = `translate(${nx}px, ${ny}px)`;
-      });
+    const menuBtn = document.getElementById('menuBtn');
+    const menuDropdown = document.getElementById('menuDropdown');
+
+    menuBtn.addEventListener('click', () => {
+      menuDropdown.classList.toggle('show');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!menuBtn.contains(e.target) && !menuDropdown.contains(e.target)) {
+        menuDropdown.classList.remove('show');
+      }
     });
   </script>
 </body>
+
 </html>
