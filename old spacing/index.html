@@ -6,16 +6,16 @@
   <title>ReLIVE!</title>
   <style>
 
-@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Bitcount+Grid+Double:wght@100..900&family=El+Messiri:wght@400..700&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Libertinus+Keyboard&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Orbitron:wght@400..900&family=Oxygen:wght@300;400;700&family=Tenor+Sans&display=swap');
+/* Libertinus Keyboard; Bitcount Grid Double; Josefin Sans; Oxygen; Orbitron; Tenor Sans; El Messiri*/ 
 :root { 
       --win: 18rem; 
       --bg-primary: #FFFAF2;
       --bg-secondary: #262626;
       --text-primary: #f5f5f5;
       --text-secondary: #a3a3a3;
-      --accent-from: #f56ebd;
-      --accent-to: #97f0b6;
+      --accent-from: #f56ebd; /* #c026d3 #fe5a47 */
+      --accent-to: #97f0b6; /* #4f46e5 */
       --border-color: #b1b0fe; 
     }
     
@@ -27,17 +27,20 @@
     
     html, body { 
       height: 100%; 
-      font-family: 'Nunito', sans-serif;
+      font-family: 'Nunito', sans-serif; /* Nunito or Quicksand */
     }
     
+    /* Prevent page from rubber‑banding while dragging */
     .no-overscroll { 
       overscroll-behavior: none; 
     }
     
+    /* Smooth, GPU-friendly movement */
     .dragging { 
       transition: none !important; 
     }
     
+    /* Header styles */
     .header {
       padding: 1rem;
       position: sticky;
@@ -70,6 +73,7 @@
       background-color: #404040;
     }
     
+    /* Main canvas area */
     .canvas {
       position: relative;
       height: calc(100svh - 56px);
@@ -77,6 +81,7 @@
       user-select: none;
     }
     
+    /* Window styles */
     .win {
       position: absolute;
       top: 1.5rem;
@@ -86,7 +91,7 @@
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
       border-radius: 1rem;
       border: 1px solid var(--border-color);
-      background-color: #c19acb;
+      background-color: #c19acb; /* #b9aebc */
       backdrop-filter: blur(8px);
       transition: transform 0.2s;
       will-change: transform;
@@ -160,6 +165,7 @@
       display: none;
     }
     
+    /* Body styling */
     body {
       background-color: var(--bg-primary);
       color: var(--text-primary);
@@ -191,41 +197,38 @@
   </template>
 
   <script>
+    /**
+     * Mobile-first draggable windows using Pointer Events.
+     * - Works on iOS Safari/Android Chrome/desktop.
+     * - Drags only by the .handle to avoid scroll conflict.
+     * - Constrains to viewport bounds.
+     * - Brings active window to front (z-index stack).
+     * - Persists positions in localStorage.
+     */
+
     const Z_BASE = 10; let zTop = Z_BASE;
     const canvas = document.getElementById('canvas');
     const tpl = document.getElementById('tpl');
 
     const windowsData = [
-      { id: 'win-topics', title: 'Topics', html: '<ul><li>Planning (42%)</li><li>Product (33%)</li><li>Team (18%)</li></ul>' },
-      { id: 'win-highlights', title: 'Highlights', html: '<div><div>Longest: 4m12s</div><div>Peak Sentiment: High @ 23:17</div></div>' },
-      { id: 'win-actions', title: 'Action Items', html: '<ol><li>Ship UI prototype</li><li>Record demo</li><li>Sync with API</li></ol>' },
-      { id: 'win-extra1', title: 'Extra Window 1', html: '<p>Additional content here.</p>' },
-      { id: 'win-extra2', title: 'Extra Window 2', html: '<p>Another extra window.</p>' },
+      { id: 'win-topics', title: 'Topics', x: 16, y: 16, html: '<ul class="list-disc list-inside space-y-1"><li>Planning (42%)</li><li>Product (33%)</li><li>Team (18%)</li></ul>' },
+      { id: 'win-highlights', title: 'Highlights', x: 16, y: 166, html: '<div class="space-y-1"><div>Longest: 4m12s</div><div>Peak Sentiment: High @ 23:17</div></div>' },
+      { id: 'win-actions', title: 'Action Items', x: 16, y: 286, html: '<ol class="list-decimal list-inside space-y-1"><li>Ship UI prototype</li><li>Record demo</li><li>Sync with API</li></ol>' },
     ];
 
-    // create windows first (at provisional positions)
+    // Restore persisted positions if any
+    windowsData.forEach(w => {
+      const saved = JSON.parse(localStorage.getItem(w.id) || 'null');
+      if (saved && Number.isFinite(saved.x) && Number.isFinite(saved.y)) { w.x = saved.x; w.y = saved.y; }
+    });
+
+    // Create windows
     windowsData.forEach(w => createWindow(w));
 
-    // then stack them using real heights
-    function layoutWindows() {
-      const gap = 10;
-      let currentY = 16;
-
-      document.querySelectorAll('.win').forEach(node => {
-        node.style.transform = `translate(16px, ${currentY}px)`;
-        const rect = node.getBoundingClientRect();
-        currentY += rect.height + gap;
-      });
-    }
-
-    // run layout after DOM paints
-    window.addEventListener('load', layoutWindows);
-    window.addEventListener('resize', layoutWindows);
-
-    function createWindow({ id, title, x = 0, y = 0, html }) {
+    function createWindow({ id, title, x, y, html }) {
       const node = tpl.content.firstElementChild.cloneNode(true);
       node.dataset.id = id;
-      node.style.transform = `translate(${x}px, ${y}px)`; // provisional
+      node.style.transform = `translate(${x}px, ${y}px)`;
       node.style.zIndex = ++zTop;
       node.querySelector('.win-title').textContent = title;
       node.querySelector('.content').innerHTML = html;
@@ -233,20 +236,25 @@
       const handle = node.querySelector('.handle');
       const minBtn = node.querySelector('.minify');
 
-      let startX = 0, startY = 0;
-      let winX = x, winY = y;
+      // Window state
+      let startX = 0, startY = 0; // pointer start
+      let winX = x, winY = y;     // current translate
       let dragging = false;
 
+      // Pointer Events (unified for touch & mouse)
       handle.addEventListener('pointerdown', onPointerDown, { passive: false });
       handle.addEventListener('dblclick', () => toggleMinify(node));
       minBtn.addEventListener('click', () => toggleMinify(node));
+
+      // Focus / raise on tap
       node.addEventListener('pointerdown', () => node.style.zIndex = ++zTop);
 
       function onPointerDown(e) {
-        e.preventDefault();
+        e.preventDefault(); // prevent page pan while dragging
         dragging = true;
         node.classList.add('dragging');
         startX = e.clientX; startY = e.clientY;
+        // current translate from style
         const m = node.style.transform.match(/translate\(([-0-9.]+)px,\s*([-0-9.]+)px\)/);
         if (m) { winX = parseFloat(m[1]); winY = parseFloat(m[2]); }
         node.setPointerCapture(e.pointerId);
@@ -259,6 +267,7 @@
         if (!dragging) return;
         e.preventDefault();
         const dx = e.clientX - startX; const dy = e.clientY - startY;
+        // Proposed new position
         let nx = winX + dx; let ny = winY + dy;
         const bounds = measureBounds(node);
         nx = Math.min(bounds.maxX, Math.max(bounds.minX, nx));
@@ -270,6 +279,7 @@
         dragging = false; node.classList.remove('dragging');
         node.releasePointerCapture(e.pointerId);
         node.removeEventListener('pointermove', onPointerMove);
+        // Persist
         const m = node.style.transform.match(/translate\(([-0-9.]+)px,\s*([-0-9.]+)px\)/);
         if (m) {
           localStorage.setItem(id, JSON.stringify({ x: parseFloat(m[1]), y: parseFloat(m[2]) }));
@@ -283,10 +293,10 @@
       const body = node.querySelector('.content');
       const isHidden = body.classList.toggle('hidden');
       node.querySelector('.minify').textContent = isHidden ? '+' : '–';
-      layoutWindows(); // reflow after toggle
     }
 
     function measureBounds(node) {
+      // Keep the whole window inside the canvas
       const rect = canvas.getBoundingClientRect();
       const nrect = node.getBoundingClientRect();
       const pad = 8;
@@ -302,9 +312,21 @@
       return { x: m ? m[1] : 0, y: m ? m[2] : 0 };
     }
 
+    // Reset positions
     document.getElementById('resetBtn').addEventListener('click', () => {
       windowsData.forEach(w => localStorage.removeItem(w.id));
       location.reload();
+    });
+
+    // Resize handling: nudge windows back into view if the keyboard/notch changes safe area
+    window.addEventListener('resize', () => {
+      document.querySelectorAll('.win').forEach(node => {
+        const bounds = measureBounds(node);
+        const pos = getTranslate(node);
+        let nx = Math.min(bounds.maxX, Math.max(bounds.minX, parseFloat(pos.x)));
+        let ny = Math.min(bounds.maxY, Math.max(bounds.minY, parseFloat(pos.y)));
+        node.style.transform = `translate(${nx}px, ${ny}px)`;
+      });
     });
   </script>
 </body>
