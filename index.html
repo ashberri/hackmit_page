@@ -5,19 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>ReLIVE!</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
 
-@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
-
-:root { 
+    :root { 
       --win: 18rem; 
       --bg-primary: #FFFAF2;
       --bg-secondary: #262626;
-      --text-primary: #f5f5f5;
-      --text-secondary: #a3a3a3;
+      --text-primary: #333333;
+      --text-secondary: #666666;
       --accent-from: #f56ebd;
       --accent-to: #97f0b6;
       --border-color: #b1b0fe; 
       --header-height: 56px;
+      --window-spacing: 1.2rem;
     }
     
     * {
@@ -33,6 +33,7 @@
     
     .dragging { 
       transition: none !important; 
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
     }
     
     .header {
@@ -41,7 +42,7 @@
       top: 0;
       left: 0;
       right: 0;
-      background-color: #fffdd0;
+      background-color: rgba(255, 253, 208, 0.95);
       backdrop-filter: blur(8px);
       z-index: 100;
       display: flex;
@@ -52,22 +53,28 @@
     }
     
     .header h1 {
-      font-weight: 600;
-      color: #c0e264; 
+      font-weight: 700;
+      color: #9ACD32;
+      font-size: 1.5rem;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     }
     
     .reset-btn {
-      padding: 0.5rem 0.75rem;
-      border-radius: 0.5rem;
-      background-color: #c19acb;
-      color: var(--text-primary);
+      padding: 0.5rem 1rem;
+      border-radius: 0.75rem;
+      background: linear-gradient(to right, #c19acb, #b28ac5);
+      color: white;
       border: none;
+      font-weight: 600;
       font-size: 0.875rem;
       cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: all 0.2s ease;
     }
     
     .reset-btn:hover {
-      background-color: #404040;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
     
     .canvas {
@@ -76,22 +83,27 @@
       overflow-y: auto;
       touch-action: pan-y;
       user-select: none;
-      padding-top: var(--header-height); /* prevent overlap with fixed header */
+      padding: calc(var(--header-height) + 1rem) 1rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--window-spacing);
     }
     
     .win {
-      position: absolute;
-      top: 1.5rem;
-      left: 1rem;
-      width: min(86vw, 380px);
-      max-width: 92vw;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      position: relative;
+      width: min(90vw, 400px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
       border-radius: 1rem;
       border: 1px solid var(--border-color);
       background-color: #c19acb;
       backdrop-filter: blur(8px);
-      transition: transform 0.2s;
+      transition: all 0.2s ease;
       will-change: transform;
+    }
+    
+    .win:hover {
+      box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.2);
     }
     
     .win-header {
@@ -99,7 +111,7 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.5rem 0.75rem;
+      padding: 0.75rem 1rem;
       border-top-left-radius: 1rem;
       border-top-right-radius: 1rem;
       background: linear-gradient(to right, var(--accent-from), var(--accent-to));
@@ -111,15 +123,16 @@
     }
     
     .win-dot {
-      width: 0.5rem;
-      height: 0.5rem;
+      width: 0.6rem;
+      height: 0.6rem;
       border-radius: 50%;
-      background-color: rgba(255, 255, 255, 0.8);
+      background-color: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
     
     .win-title {
-      font-size: 0.875rem;
-      font-weight: 600;
+      font-size: 1rem;
+      font-weight: 700;
       flex-grow: 1;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -127,35 +140,39 @@
     }
     
     .minify-btn {
-      font-size: 0.75rem;
-      background-color: rgba(255, 255, 255, 0.1);
-      padding: 0.25rem 0.5rem;
-      border-radius: 0.375rem;
+      font-size: 1rem;
+      font-weight: bold;
+      background-color: rgba(255, 255, 255, 0.15);
+      padding: 0.25rem 0.6rem;
+      border-radius: 0.5rem;
       border: none;
       color: white;
       cursor: pointer;
+      transition: all 0.2s ease;
     }
     
     .minify-btn:hover {
-      background-color: rgba(255, 255, 255, 0.2);
+      background-color: rgba(255, 255, 255, 0.25);
     }
     
     .win-content {
-      padding: 0.75rem;
-      font-size: 0.875rem;
+      padding: 1rem;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: var(--text-primary);
     }
     
     .win-content p {
-      opacity: 0.9;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.75rem;
     }
     
     .win-content ul, .win-content ol {
       padding-left: 1.5rem;
+      margin-bottom: 0.5rem;
     }
     
     .win-content li {
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.5rem;
     }
     
     .hidden {
@@ -163,9 +180,38 @@
     }
     
     body {
-      background-color: var(--bg-primary);
+      background: linear-gradient(135deg, var(--bg-primary) 0%, #f8f4e9 100%);
       color: var(--text-primary);
       min-height: 100svh;
+    }
+    
+    /* Scrollbar styling */
+    .canvas::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .canvas::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 10px;
+    }
+    
+    .canvas::-webkit-scrollbar-thumb {
+      background: rgba(193, 154, 203, 0.5);
+      border-radius: 10px;
+    }
+    
+    .canvas::-webkit-scrollbar-thumb:hover {
+      background: rgba(193, 154, 203, 0.7);
+    }
+    
+    /* Animation for new windows */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .win {
+      animation: fadeIn 0.3s ease-out;
     }
   </style>
 </head>
@@ -205,21 +251,16 @@
       { id: 'win-extra2', title: 'Extra Window 2', html: '<p>Another extra window.</p>' },
     ];
 
-    windowsData.forEach(w => createWindow(w));
-
-    function layoutWindows() {
-      const gap = 24;
-      let currentY = 51;
-
-      document.querySelectorAll('.win').forEach(node => {
-        node.style.transform = `translate(10px, ${currentY}px)`;
-        const rect = node.getBoundingClientRect();
-        currentY += rect.height + gap;
-      });
-    }
-
-    window.addEventListener('load', layoutWindows);
-    window.addEventListener('resize', layoutWindows);
+    // Load saved positions or use default layout
+    windowsData.forEach(w => {
+      const savedPos = localStorage.getItem(w.id);
+      if (savedPos) {
+        const { x, y } = JSON.parse(savedPos);
+        createWindow({ ...w, x, y });
+      } else {
+        createWindow(w);
+      }
+    });
 
     function createWindow({ id, title, x = 0, y = 0, html }) {
       const node = tpl.content.firstElementChild.cloneNode(true);
@@ -282,7 +323,6 @@
       const body = node.querySelector('.content');
       const isHidden = body.classList.toggle('hidden');
       node.querySelector('.minify').textContent = isHidden ? '+' : '–';
-      layoutWindows();
     }
 
     function measureBounds(node) {
